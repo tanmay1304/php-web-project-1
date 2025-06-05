@@ -60,7 +60,7 @@ $query = $con->query($sql) or die($con->error);
             <div class="container">
                 <h1><i class="fas fa-shield-alt"></i> Administrare
             </h1>
-                <p class="lead">Bine ai venit, <?php echo htmlspecialchars($_SESSION['user_email']); ?>!</p>
+                <p class="lead">Bine ai venit, <?php echo htmlspecialchars($_SESSION['admin_email']); ?>!</p>
             </div>
         </div>
 
