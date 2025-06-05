@@ -1,18 +1,13 @@
 <?php
 session_start();
-// We only need to include the Book class, it will handle the database connection
 require_once __DIR__ . '/../lib/Book.php';
 
-// Get the book ID from the URL, ensuring it's an integer
 $book_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-
-// Find the book using our new static method
 $book = Book::findById($book_id);
 
-// If no book is found with that ID, handle it gracefully
 if (!$book) {
-    header("Location: ../catalog.php"); // Redirect back to the catalog
-    exit(); // Stop executing the script
+    header("Location: ../catalog.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -26,19 +21,19 @@ if (!$book) {
 </head>
 <body>
     <div class="header-container">
+        <div class="logo">
+            <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderSus" overflow="hidden" object-fit="none" />
+        </div>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container px-5">
                 <a class="navbar-brand" href="/">Raftul nostru</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation"><span
-                        class="navbar-toggler-icon"></span></button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav d-flex justify-content-evenly align-items-center w-100">
                         <li class="nav-item"><a class="nav-link" href="/">Acasă</a></li>
                         <li class="nav-item"><a class="nav-link" href="/despre-noi.php">Despre noi</a></li>
                         <li class="nav-item"><a class="nav-link" href="/imprumuta.php">Împrumută</a></li>
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/catalog.php">Catalog</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/catalog.php">Catalog</a></li>
                         <li class="nav-item"><a class="nav-link" href="/sugestii.php">Sugestii</a></li>
                         <li class="nav-item"><a class="nav-link" href="/log-in.php">Log in</a></li>
                     </ul>
@@ -46,10 +41,9 @@ if (!$book) {
             </div>
         </nav>
     </div>
+
     <br /> <br />
-    
     <h3 style="text-align: center">Detalii carte</h3>
-    
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -68,7 +62,7 @@ if (!$book) {
                             </div>
                             <?php if(!empty($book->image)): ?>
                             <div class="col-md-4 text-center">
-                                <img src="<?php echo htmlspecialchars($book->image); ?>" class="img-fluid" style="max-width: 100%; height: auto;" alt="Imagine carte">
+                                <img src="<?php echo '..' . htmlspecialchars($book->image); ?>" class="img-fluid" style="max-width: 100%; height: auto;" alt="Imagine carte">
                             </div>
                             <?php endif; ?>
                         </div>
@@ -77,7 +71,6 @@ if (!$book) {
             </div>
         </div>
     </div>
-
     <br /> <br />
     <div class="text-center">
         <a class="btn btn-secondary btn-lg" href="../catalog.php">Înapoi la Catalog</a>
@@ -89,7 +82,12 @@ if (!$book) {
             <p class="m-0 text-center text-white">Copyright &copy; Raftul nostru 2025</p>
         </div>
     </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/scripts.js"></script>
+
+    <div class="logo">
+        <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderJos" overflow="hidden" object-fit="none" />
+    </div>
 </body>
 </html>
