@@ -2,21 +2,18 @@
 session_start();
 require_once __DIR__ . '/lib/User.php';
 
-// --- Form Validation Variables ---
 $numeErr = $prenumeErr = $telefonErr = $emailErr = $passwordErr = "";
 $nume = $prenume = $telefon = $email = $password = "";
 $form_was_submitted = ($_SERVER["REQUEST_METHOD"] === "POST");
 $err = 0;
 
 if ($form_was_submitted) {
-    // --- Input Validation Logic (mostly unchanged) ---
     function test_input($data){
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
         return $data;
     }
-
     if (empty($_POST["nume"])) {
         $numeErr = "Lipsă nume.";
         $err = 1;
@@ -27,7 +24,6 @@ if ($form_was_submitted) {
             $err = 1;
         }
     }
-
     if (empty($_POST["prenume"])) {
         $prenumeErr = "Lipsă prenume.";
         $err = 1;
@@ -38,7 +34,6 @@ if ($form_was_submitted) {
             $err = 1;
         }
     }
-
     if (empty($_POST["telefon"])) {
         $telefonErr = "Lipsă telefon.";
         $err = 1;
@@ -49,7 +44,6 @@ if ($form_was_submitted) {
             $err = 1;
         }
     }
-
     if (empty($_POST["email"])) {
         $emailErr = "Lipsă email.";
         $err = 1;
@@ -60,33 +54,23 @@ if ($form_was_submitted) {
             $err = 1;
         }
     }
-
     if (empty($_POST["parola"])) {
         $passwordErr = "Lipsă parolă.";
         $err = 1;
     } else {
         $password = test_input($_POST["parola"]);
     }
-
-    // --- New Object-Oriented Database Logic ---
     if ($err == 0) {
-        // 1. Create a new User object from the validated POST data
         $user = new User([
             'nume' => $nume,
             'prenume' => $prenume,
             'telefon' => $telefon,
             'email' => $email,
-            'parola' => $password // The User class will handle the password
+            'parola' => $password
         ]);
-        
-        // 2. Save the user to the database
         if ($user->save()) {
             $success_message = "Utilizator înregistrat cu succes!";
-            // Optional: You can still set cookies here if you wish
-            // setcookie('nume', $nume, time() + 3600, "/");
-            // setcookie('user_role', "user", time() + 3600, "/");
         } else {
-            // This could happen if the email is already taken (if you add a UNIQUE constraint in your DB)
             $emailErr = "A apărut o eroare la înregistrare. Este posibil ca email-ul să fie deja folosit.";
         }
     }
@@ -104,13 +88,13 @@ if ($form_was_submitted) {
 </head>
 <body>
     <div class="header-container">
+        <div class="logo">
+            <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderSus" overflow="hidden" object-fit="none" />
+        </div>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container px-5">
                 <a class="navbar-brand" href="/">Raftul nostru</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation"><span
-                        class="navbar-toggler-icon"></span></button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav d-flex justify-content-evenly align-items-center w-100">
                         <li class="nav-item"><a class="nav-link" href="/">Acasă</a></li>
@@ -123,17 +107,16 @@ if ($form_was_submitted) {
             </div>
         </nav>
     </div>
+
     <br><br>
     <div class="row" style="text-align: center">
         <h1 style="text-align: center"> Înregistrare </h1>
-        
         <?php if (isset($success_message)): ?>
             <div style="color: green; font-weight: bold;"><?php echo $success_message; ?></div>
             <br>
             <a href="log-in.php">Click aici pentru a te autentifica.</a>
             <br><br>
         <?php endif; ?>
-        
         <p><span class="error" style="font-size:8pt; text-align: center">*câmp necesar </span></p>
         <br>
         <div class="container d-flex justify-content-center">
@@ -166,7 +149,12 @@ if ($form_was_submitted) {
             <p class="m-0 text-center text-white">Copyright &copy; Raftul nostru 2025</p>
         </div>
     </footer>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
+
+    <div class="logo">
+        <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderJos" style="overflow: hidden; object-fit: cover;" />
+    </div>
 </body>
 </html>
