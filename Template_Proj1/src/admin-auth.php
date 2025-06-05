@@ -1,6 +1,8 @@
 <?php
-session_start();
 require_once __DIR__ . '/lib/Admin.php';
+require_once __DIR__ . '/lib/Auth.php';
+
+Auth::startSession(); 
 
 // If an admin is already logged in, redirect them to the admin welcome page
 if (isset($_SESSION['admin_id'])) {
