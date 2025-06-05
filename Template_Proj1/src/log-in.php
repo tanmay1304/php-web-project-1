@@ -65,12 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($user && $user->verifyPassword($parola)) {
             // --- Login Successful ---
             // Regenerate session ID for security
-            session_regenerate_id(true); 
-            
-            // Set session variables
-            $_SESSION['user_id'] = $user->id;
-            $_SESSION['user_email'] = $user->email;
-            $_SESSION['user_nume'] = $user->nume;
+            Auth::login($user);
             
             regenerate_captcha(); // Prepare a new captcha for next time
             header("Location: welcome.php");
