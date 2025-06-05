@@ -2,27 +2,23 @@
 require_once __DIR__ . '/lib/Admin.php';
 require_once __DIR__ . '/lib/Auth.php';
 
-Auth::startSession(); 
+Auth::startSession();
 
-// If an admin is already logged in, redirect them to the admin welcome page
-if (isset($_SESSION['admin_id'])) {
+if (Auth::isAdminLoggedIn()) {
     header("Location: welcome-admin.php");
     exit();
 }
 
-// Ensure the captcha numbers are set in the session
 if (!isset($_SESSION['number1']) || !isset($_SESSION['number2'])) {
     $_SESSION['number1'] = rand(0, 30);
     $_SESSION['number2'] = rand(0, 30);
     $_SESSION['correctsum'] = $_SESSION['number1'] + $_SESSION['number2'];
 }
 
-// --- Form Validation Variables ---
 $emailErr = $parolaErr = $captchaErr = "";
 $email = "";
 $err = 0;
 
-// --- Helper function to regenerate captcha (same as in log-in.php) ---
 function regenerate_captcha() {
     $_SESSION['number1'] = rand(0, 30);
     $_SESSION['number2'] = rand(0, 30);
@@ -30,7 +26,6 @@ function regenerate_captcha() {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // --- Basic Input Validation ---
     if (empty($_POST["email"])) {
         $emailErr = "Email este necesar.";
         $err = 1;
@@ -55,23 +50,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $err = 1;
     }
 
-    // --- New Object-Oriented Login Logic ---
     if ($err == 0) {
         $parola = trim($_POST["parola"]);
-        
-        // 1. Find the admin by email using our new class
         $admin = Admin::findByEmail($email);
         
-        // 2. If admin exists, verify the password
         if ($admin && $admin->verifyPassword($parola)) {
-            // --- Login Successful ---
             Auth::loginAdmin($admin);
-            
             regenerate_captcha();
             header("Location: welcome-admin.php");
             exit();
         } else {
-            // --- Login Failed ---
             $emailErr = "Email sau parolă incorectă.";
             regenerate_captcha();
         }
@@ -112,52 +100,60 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             </div>
         </nav>
-        
-        <br><br>
-        <h1 style="text-align:center">Autentificare</h1>
-        <h3 style="text-align:center; font-size:6px">(admin only)</h3>
-        <br><br>
+    </div>
+    
+    <br><br>
+    <h1 style="text-align:center">Autentificare</h1>
+    <h3 style="text-align:center; font-size:6px">(admin only)</h3>
+    <br><br>
 
-        <div class="row justify-content-center">
-            <div class="col-md-3 align-content-center">
-                <div class="card">
-                    <div class="card-body bg-secondary">
-                        <form method="post" action="admin-auth.php">
-                            <div class="mb-2">
-                                <label for="email" class="form-label">Email:</label>
-                                <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
-                                <span class="error"><?php echo $emailErr; ?></span>
-                            </div>
-                            <div class="mb-3">
-                                <label for="parola" class="form-label">Parola:</label>
-                                <input type="password" class="form-control" id="parola" name="parola">
-                                <span class="error"><?php echo $parolaErr; ?></span>
-                            </div>
-                            <div class="mb-3">
-                                <label for="captcha" class="form-label">
-                                    Captcha: <?php echo $_SESSION['number1'] . ' + ' . $_SESSION['number2'] . ' = '; ?>
-                                </label>
-                                <input type="text" class="form-control" id="captcha" name="captcha" placeholder="Introdu suma">
-                                <span class="error"><?php echo $captchaErr; ?></span>
-                            </div>
-                            <div class="text-center">
-                                <input type="submit" name="submit" class="btn btn-primary" value="Logare">
-                                <input type="reset" class="btn btn-secondary" value="Reset fields">
-                            </div>
-                        </form>
-                    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-3 align-content-center">
+            <div class="card">
+                <div class="card-body bg-secondary">
+                    <form method="post" action="admin-auth.php">
+                        <div class="mb-2">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
+                            <span class="error"><?php echo $emailErr; ?></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="parola" class="form-label">Parola:</label>
+                            <input type="password" class="form-control" id="parola" name="parola">
+                            <span class="error"><?php echo $parolaErr; ?></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="captcha" class="form-label">
+                                Captcha: <?php echo $_SESSION['number1'] . ' + ' . $_SESSION['number2'] . ' = '; ?>
+                            </label>
+                            <input type="text" class="form-control" id="captcha" name="captcha" placeholder="Introdu suma">
+                            <span class="error"><?php echo $captchaErr; ?></span>
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" name="submit" class="btn btn-primary" value="Logare">
+                            <input type="reset" class="btn btn-secondary" value="Reset fields">
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
-        <br><br><br><br>
-        <footer class="py-5 bg-dark">
-            <div class="container px-4 px-lg-5">
-                <p class="m-0 text-center text-white">Copyright &copy; Raftul nostru 2025</p>
-            </div>
-        </footer>
     </div>
+
+    <br><br>
+    <br><br>
+
+    <footer class="py-5 bg-dark">
+        <div class="container px-4 px-lg-5">
+            <p class="m-0 text-center text-white">Copyright &copy; Raftul nostru 2025</p>
+        </div>
+    </footer>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
+    
+    <div class="logo">
+        <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderJos" overflow="hidden"
+             object-fit="none" />
+    </div>
 </body>
 </html>
