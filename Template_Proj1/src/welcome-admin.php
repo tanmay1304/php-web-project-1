@@ -1,19 +1,15 @@
 <?php
-session_start();
-include 'connection.php';
+require_once __DIR__ . '/lib/Auth.php';
+require_once __DIR__ . '/lib/Database.php';
 
-if (!isset($_SESSION['user_email'])) {
-    header("Location: log-in.php");
-    exit();
-}
-/*
-if ($_SESSION['user_role'] !== 'admin') {
-    header("Location: index.php");
-    exit();
-}
-*/
+Auth::startSession();
+Auth::requireAdminLogin(); 
+
+$admin_email = $_SESSION['admin_email'];
+
+$con = Database::getInstance()->getConnection();
 $sql = 'SELECT * FROM users ORDER BY id ASC';
-$query = mysqli_query($con, $sql) or die(mysqli_error($con));
+$query = $con->query($sql) or die($con->error);
 ?>
 
 <!DOCTYPE html>
