@@ -63,11 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // 2. If admin exists, verify the password
         if ($admin && $admin->verifyPassword($parola)) {
             // --- Login Successful ---
-            session_regenerate_id(true);
-            
-            // Set admin-specific session variables
-            $_SESSION['admin_id'] = $admin->id;
-            $_SESSION['admin_email'] = $admin->email;
+            Auth::loginAdmin($admin);
             
             regenerate_captcha();
             header("Location: welcome-admin.php");
