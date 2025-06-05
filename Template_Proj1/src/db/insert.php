@@ -2,44 +2,29 @@
 session_start();
 require_once __DIR__ . '/../lib/Book.php';
 
-// This function will handle the image upload and return the path for the database.
 function handleImageUpload($titlu, $autor, $editura) {
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/images/';
-        
-        // Ensure the /images directory exists
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
-        
-        // Create a safe, unique filename
         $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
         $safe_titlu = preg_replace('/[^A-Za-z0-9\-]/', '_', $titlu);
         $safe_autor = preg_replace('/[^A-Za-z0-9\-]/', '_', $autor);
         $safe_editura = preg_replace('/[^A-Za-z0-9\-]/', '_', $editura);
         $filename = $safe_titlu . '_' . $safe_autor . '_' . $safe_editura . '.' . $file_extension;
-        
         $target_path = $upload_dir . $filename;
         $db_path = '/images/' . $filename;
-        
-        // Move the uploaded file to the target location
         if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
-            return $db_path; // Return path to store in DB
+            return $db_path;
         }
     }
-    return ''; // Return empty string if no file or an error occurred
+    return '';
 }
 
-
-// Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 1. Create a new Book object from the POST data
     $book = new Book($_POST);
-    
-    // 2. Handle the image upload
     $book->image = handleImageUpload($_POST['titlu'], $_POST['autor'], $_POST['editura']);
-    
-    // 3. Save the book to the database
     if ($book->save()) {
         $message = "Înregistrarea a fost adăugată cu succes!";
     } else {
@@ -58,13 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="header-container">
+        <div class="logo">
+            <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderSus" overflow="hidden" object-fit="none" />
+        </div>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container px-5">
                 <a class="navbar-brand" href="/">Raftul nostru</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation"><span
-                        class="navbar-toggler-icon"></span></button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav d-flex justify-content-evenly align-items-center w-100">
                         <li class="nav-item"><a class="nav-link" href="/">Acasă</a></li>
@@ -78,16 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </nav>
     </div>
-    <br /> <br />
 
+    <br /> <br />
     <h3 style="text-align: center"> Inserare element</h3>
-    
     <?php if (isset($message)): ?>
         <div style="text-align: center; color: green; font-weight: bold;">
             <br><br><?php echo $message; ?>
         </div>
     <?php endif; ?>
-
     <div class="container d-flex justify-content-center">
         <form method="post" action="insert.php" enctype="multipart/form-data">
             Titlu:<br /><input type="text" name="titlu" required /><br />
@@ -101,7 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" name="submit" value="Submit" />
         </form>
     </div>
-
     <br /><br />
     <div class="text-center">
         <a class="btn btn-secondary btn-lg" href="../catalog.php">Înapoi la Catalog</a>
@@ -113,7 +95,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="m-0 text-center text-white">Copyright &copy; Raftul nostru 2025</p>
         </div>
     </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/scripts.js"></script>
+    
+    <div class="logo">
+        <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderJos" overflow="hidden" object-fit="none" />
+    </div>
 </body>
 </html>
