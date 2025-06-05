@@ -4,34 +4,28 @@ require_once __DIR__ . '/lib/Auth.php';
 
 Auth::startSession();
 
-// If user is already logged in, redirect them away
-if (isset($_SESSION['user_id'])) {
+if (Auth::isUserLoggedIn()) {
     header("Location: welcome.php");
     exit();
 }
 
-// Ensure the captcha numbers are set in the session
 if (!isset($_SESSION['number1']) || !isset($_SESSION['number2'])) {
     $_SESSION['number1'] = rand(0, 30);
     $_SESSION['number2'] = rand(0, 30);
     $_SESSION['correctsum'] = $_SESSION['number1'] + $_SESSION['number2'];
 }
 
-// --- Form Validation Variables ---
 $emailErr = $parolaErr = $captchaErr = "";
 $email = "";
 $err = 0;
 
-// --- Helper function to regenerate captcha ---
 function regenerate_captcha() {
     $_SESSION['number1'] = rand(0, 30);
     $_SESSION['number2'] = rand(0, 30);
     $_SESSION['correctsum'] = $_SESSION['number1'] + $_SESSION['number2'];
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // --- Basic Input Validation ---
     if (empty($_POST["email"])) {
         $emailErr = "Email este necesar.";
         $err = 1;
@@ -56,30 +50,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $err = 1;
     }
 
-    // --- New Object-Oriented Login Logic ---
     if ($err == 0) {
         $parola = trim($_POST["parola"]);
-        
-        // 1. Find the user by email
         $user = User::findByEmail($email);
         
-        // 2. If user exists, verify the password
         if ($user && $user->verifyPassword($parola)) {
-            // --- Login Successful ---
-            // Regenerate session ID for security
             Auth::login($user);
-            
-            regenerate_captcha(); // Prepare a new captcha for next time
+            regenerate_captcha();
             header("Location: welcome.php");
             exit();
         } else {
-            // --- Login Failed ---
-            // Use a generic error message for security (don't reveal if email or password was wrong)
             $emailErr = "Email sau parolă incorectă.";
             regenerate_captcha();
         }
     } else {
-        // If there were any validation errors, regenerate the captcha
         regenerate_captcha();
     }
 }
@@ -116,56 +100,65 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             </div>
         </nav>
-        
-        <br><br>
-        <a href="admin-auth.php" style="text-align: center; color: black !important; text-decoration: none !important;">
-            <h1>Autentificare</h1>
-        </a>
-        <br><br>
+    </div>
 
-        <div class="row justify-content-center">
-            <div class="col-md-3 align-content-center">
-                <div class="card">
-                    <div class="card-body">
-                        <form method="post" action="log-in.php">
-                            <div class="mb-2">
-                                <label for="email" class="form-label">Email:</label>
-                                <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
-                                <span class="error"><?php echo $emailErr; ?></span>
-                            </div>
-                            <div class="mb-3">
-                                <label for="parola" class="form-label">Parola:</label>
-                                <input type="password" class="form-control" id="parola" name="parola">
-                                <span class="error"><?php echo $parolaErr; ?></span>
-                            </div>
-                            <div class="mb-3">
-                                <label for="captcha" class="form-label">
-                                    Captcha: <?php echo $_SESSION['number1'] . ' + ' . $_SESSION['number2'] . ' = '; ?>
-                                </label>
-                                <input type="text" class="form-control" id="captcha" name="captcha" placeholder="Introdu suma">
-                                <span class="error"><?php echo $captchaErr; ?></span>
-                            </div>
-                            <div class="text-center">
-                                <input type="submit" name="submit" class="btn btn-primary" value="Logare">
-                                <input type="reset" class="btn btn-secondary" value="Reset fields">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-footer text-center">
-                        <a class="btn btn-secondary" href="creare-cont.php">Înregistrează-te</a>
-                    </div>
+    <br><br>
+    <br><br>
+    <a href="admin-auth.php" style="text-align: center; color: black !important; text-decoration: none !important;">
+        <h1>Autentificare</h1>
+    </a>
+    <br><br>
+
+    <div class="row justify-content-center">
+        <div class="col-md-3 align-content-center">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="log-in.php">
+                        <div class="mb-2">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
+                            <span class="error"><?php echo $emailErr; ?></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="parola" class="form-label">Parola:</label>
+                            <input type="password" class="form-control" id="parola" name="parola">
+                            <span class="error"><?php echo $parolaErr; ?></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="captcha" class="form-label">
+                                Captcha: <?php echo $_SESSION['number1'] . ' + ' . $_SESSION['number2'] . ' = '; ?>
+                            </label>
+                            <input type="text" class="form-control" id="captcha" name="captcha" placeholder="Introdu suma">
+                            <span class="error"><?php echo $captchaErr; ?></span>
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" name="submit" class="btn btn-primary" value="Logare">
+                            <input type="reset" class="btn btn-secondary" value="Reset fields">
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a class="btn btn-secondary" href="creare-cont.php">Înregistrează-te</a>
                 </div>
             </div>
         </div>
-
-        <br><br><br><br>
-        <footer class="py-5 bg-dark">
-            <div class="container px-4 px-lg-5">
-                <p class="m-0 text-center text-white">Copyright &copy; Raftul nostru 2025</p>
-            </div>
-        </footer>
     </div>
+
+    <br><br>
+    <br><br>
+    
+    <footer class="py-5 bg-dark">
+        <div class="container px-4 px-lg-5">
+            <p class="m-0 text-center text-white">Copyright &copy; Raftul nostru 2025</p>
+        </div>
+    </footer>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
+    
+    <div class="logo">
+        <img src="/assets/pozaSus.jpg" width="100%" height="50" class="pozaHeaderJos" overflow="hidden"
+             object-fit="none" />
+    </div>
 </body>
 </html>
