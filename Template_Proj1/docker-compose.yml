@@ -1,22 +1,23 @@
-version: '3.9' 
+version: '3.9'
 
 services:
   php-env:
-    build: . #path to dockerfile
-    volumes: 
-      - ./src:/var/www/html 
+    build: .
+    volumes:
+      - ./src:/var/www/html
     ports:
       - 8080:80
-  
+
   mysql_db:
     image: mysql:latest
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: toor
-    volumes: 
-      - /var/lib/docker/volumes/volume1
+      MYSQL_DATABASE: Catalog
     ports:
       - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -25,3 +26,6 @@ services:
       - 8081:80
     environment:
       - PMA_ARBITRARY=1
+
+volumes:
+  mysql_data:
