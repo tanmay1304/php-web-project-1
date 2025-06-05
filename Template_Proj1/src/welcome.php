@@ -1,15 +1,11 @@
 <?php
-session_start();
-include 'connection.php';
+require_once __DIR__ . '/lib/Auth.php';
 
-if (!isset($_SESSION['user_email'])) {
-    header("Location: log-in.php");
-    exit();
-}
+Auth::startSession();
+Auth::requireUserLogin(); 
 
 
-$sql = 'SELECT * FROM users ORDER BY id ASC';
-$query = mysqli_query($con, $sql) or die(mysqli_error($con));
+$user_email = $_SESSION['user_email']; 
 ?>
 
 <!DOCTYPE html>
