@@ -1,6 +1,8 @@
 <?php
-session_start();
 require_once __DIR__ . '/lib/User.php';
+require_once __DIR__ . '/lib/Auth.php';
+
+Auth::startSession();
 
 // If user is already logged in, redirect them away
 if (isset($_SESSION['user_id'])) {
